@@ -4,7 +4,7 @@ const { Router } = require('express')
 const Team = require('./model')
 //instantiate router
 const router = new Router()
-//register get endpoint for team
+//register get endpoint to get all teams
 router.get('/team', (req, res, next) => {
     Team.findAll()
     .then(teams => {
@@ -13,7 +13,7 @@ router.get('/team', (req, res, next) => {
     .catch(error => next(error))
 })
 
-//add post endpoint for teams
+//add post endpoint to add a team
 router.post('/team', (req, res) => {
     console.log("NOTE HERE REQ BODY", req.body)
     Team.create(req.body)
@@ -21,6 +21,26 @@ router.post('/team', (req, res) => {
     .send(team))
     .catch(err => next(err)) 
     })
+
+//make endpoint to retrieve a specific team based on ID
+
+router.get('/team/:id', (req, res, next) => {
+    const id = req.params.id
+    Team.findByPk(id)
+    .then(team => {
+        res.status(200).send(team)
+    })
+    .catch(err => next(err))
+})
+
+//make endpoint to update team values/properties
+router.put('/team/:id', (req, res, next) => {
+    const id = req.params.id
+    Team.findByPk(id)
+    .then(team => team.update(req.body))
+    .then(team => res.status(200).send(team))
+    .catch(err => next(err))
+})
 
 
 module.exports = router
