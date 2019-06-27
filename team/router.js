@@ -14,8 +14,7 @@ router.get('/team', (req, res, next) => {
 })
 
 //add post endpoint to add a team
-router.post('/team', (req, res) => {
-    console.log("NOTE HERE REQ BODY", req.body)
+router.post('/team', (req, res, next) => {
     Team.create(req.body)
     .then(team => res.status(200)
     .send(team))
@@ -42,5 +41,21 @@ router.put('/team/:id', (req, res, next) => {
     .catch(err => next(err))
 })
 
+//parralel promises returning count() and findAll()
+router.get('/teams', (req, res, next) => {
+    const limit = req.query.limit || 5
+    const offset = req.query.offset || 0
+  
+    Promise.all([
+      Team.count(),
+      Team.findAll({ limit, offset })
+    ])
+      .then(([total, teams]) => {
+        res.send({
+          teams, total
+        })
+      })
+      .catch(error => next(error))
+  })
 
 module.exports = router
